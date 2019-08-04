@@ -12,21 +12,16 @@ __lua__
 function _init()
   cartdata("typhyter_blx_cd")
   dset(0, 1)
-  write_gpio_unsigned(7, 1, 8)
   printh("started")
   poke(0x5f2c,3) -- set mode3 64x64
   animTimer=0
-  -- init_blx()
   init_cols()
 end
 
 function _update60()
   update_cols()
   if btnp(5) then
-    -- printh("gpio: "..tostr(peek(0x5f80)))
     dset(0,dget(0) + 10)
-    -- local oldgpio=read_gpio(1,8) 
-    -- write_gpio(oldgpio+1,1,8)
     printh("cartdata[0]: "..tostr(dget(0)))
   end
 end
@@ -35,18 +30,14 @@ function _draw()
   cls()
 
   -- column divider bars
-  for x=0,7 do
-  	for y=0,6 do
-  		spr(1,x*8+0,y*8+0)
-  	end
-  end
+  -- for x=0,7 do
+  -- 	for y=0,6 do
+  -- 		spr(1,x*8+0,y*8+0)
+  -- 	end
+  -- end
   
   
   draw_cols()
-  -- print("dget: "..tostr(dget(0)))
-  -- print("gpio: "..tostr(read_gpio_unsigned(1, 8)))
-  -- print("cpu: "..tostr(stat(1)).."%")
-  -- print("mem: "..tostr(stat(0)).."/2048")
 end
 
 function add_blx(cnt,col_i,blxList)
@@ -55,14 +46,10 @@ function add_blx(cnt,col_i,blxList)
     block.id = 5
     block.color = flr(1+rnd(5))
     block.column = col_i
-    block.y = 0 + (i - 1) * 5
+    block.y = 0 + (i - 1) * 6
     block.frame = 0
     add(blxList,block)
-    -- printh("block added to column: "..tostr(col))
-    -- printh("block.y: "..tostr(block.y))
-    -- printh("block.color: "..tostr(block.color))
   end
-  -- return obj
 end
 
 function init_cols() 
@@ -94,7 +81,7 @@ function draw_cols()
       -- printh("b.column: "..tostr(b.column))
       x=5+(8*(b.column-1))
       y=b.y
-      rectfill(x,y,x+5,y+5,b.color)
+      rectfill(x,y,x+4,y+4,b.color)
     
       spr(5+b.frame,x,y)
     end)
@@ -118,52 +105,13 @@ function update_cols()
   end
 end
 
-function write_gpio(num,pin_index,bits)
-   write_gpio_unsigned(
-   num + shl(1, bits-1),
-   pin_index,
-   bits
-  )
- end
- 
- function write_gpio_unsigned(num,pin_index,bits)
-  local lastbit_i =
-   0x5f80+pin_index+bits-1
-  local mask = 1
-  for j=0,bits-1 do
-   local bit = shr(band(num, mask), j)
-   poke(lastbit_i-j, bit*255)
-   mask = shl(mask, 1)
-  end
- end
- 
- function read_gpio(pin_index,bits)
-  return read_gpio_unsigned(
-   pin_index,
-   bits
-  ) - shl(1, bits-1)
- end
- 
- function read_gpio_unsigned(pin_index,bits)
-  local firstbit_i =
-   0x5f80+pin_index
-  local num = 0
-  for j=0,bits-1 do
-   local val = peek(firstbit_i+j)
-   if val > 0 then
-    num = num + shl(1, bits-1-j)
-   end
-  end
-  return num
- end
-
 __gfx__
 00000000000030000004500066667ddd66667d000000600070000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000033000000530006111111d60000d000000000066000000060000000000000000000000000000000000000000000000000000000000000000000000
 007007000004000000035000d111111dd0000d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000770000000300000044000d111111dd0000d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000770000000300000035000d111111dd0000d000500000005000000050000000000000000000000000000000000000000000000000000000000000000000000
-007007000003400000055000d111111dd55555000000550000005000500055000000000000000000000000000000000000000000000000000000000000000000
+007007000003400000055000d111111dd55555000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000000000003000000033000d111111d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000000000004000000043000d5555555000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
